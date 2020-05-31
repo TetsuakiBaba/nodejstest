@@ -1,7 +1,17 @@
-var http = require('http');
-http.createServer(function (request, response) {
-  response.writeHead(200, {'Content-Type': 'text/plain'});
-  response.end('Hello World\n');
-}).listen(3000);
+var express = require('express');
+var app = express();
+var server = app.listen(3000);
+app.use(express.static('../public'));
+console.log("My socket server is runnning");
+var socket = require('socket.io');
+var io = socket(server);
+io.sockets.on('connection', newConnection);
 
-console.log('Server running at http://127.0.0.1:3000');
+function newConnection(socket){
+    console.log('new connection: ' + socket.id);
+    socket.on('mouse', mouseMsg);
+    function mouseMsg(data){
+        socket.broadcast.emit('mouse', data);
+        console.log(data);
+    }
+}
